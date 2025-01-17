@@ -46,8 +46,11 @@ function FileUpload() {
     setValue("file", null);
   };
 
-  const removeUrl = () => {
+  const remove = () => {
+    setUploadedImage(null);
+    setUploadedData(null);
     setUploadedUrl(null);
+    setValue("file", null);
     setValue("url", null);
   };
 
@@ -62,6 +65,7 @@ function FileUpload() {
           console.error("Failed to copy text: ", err);
         });
     };
+
     const handleShare = (url) => {
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(url)}`;
       window.open(whatsappUrl, "_blank");
@@ -87,6 +91,7 @@ function FileUpload() {
           handleShare(url);
           Swal.close();
         };
+
         const root = ReactDOM.createRoot(
           document.getElementById("success-alert")
         );
@@ -94,11 +99,14 @@ function FileUpload() {
           <SuccessAlert link={url} onCopy={onCopy} onShare={onShare} />
         );
       },
+      didClose: () => {
+        remove();
+      },
     });
   };
 
   const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
+    const file = event.target.files ? event.target.files[0] : event[0];
 
     if (file) {
       try {
@@ -124,7 +132,7 @@ function FileUpload() {
         }
       } catch (error) {
         Swal.fire({
-          icon: "error",
+          icon: "warning",
           title: "Upload Failed",
           text: error.message || "An error occurred while uploading the file.",
           confirmButtonText: "OK",
@@ -159,7 +167,7 @@ function FileUpload() {
     const url = watch("image_url");
     try {
       const response = await linkUpload(url);
-      
+
       if (response.image_url) {
         handleSuccess(response.image_url);
         setUploadedUrl(response.image_url);
@@ -180,7 +188,6 @@ function FileUpload() {
       });
     }
   };
-  
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -201,7 +208,12 @@ function FileUpload() {
 
     const file = event.dataTransfer.files[0];
     if (file) {
-      handleFileUpload(file);
+      const fakeEvent = {
+        target: {
+          files: [file],
+        },
+      };
+      handleFileUpload(fakeEvent);
     }
   };
 
@@ -218,7 +230,7 @@ function FileUpload() {
         </div>
       </div>
       <div className="px-20 ">
-        <div className="min-h-screen flex flex-col ">
+        <div className="min-h-screen flex flex-col justify-center items-center">
           <form className="bg-white py-10 rounded-lg shadow-md max-w-4xl w-full px-20 mt-16">
             <div>
               <h3 className="md:text-2xl font-semibold">Upload File</h3>

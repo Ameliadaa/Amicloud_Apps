@@ -55,47 +55,67 @@ export default function FileUpload() {
   };
 
 
+
+  const remove = () => {
+    setUploadedImage(null);
+    setUploadedData(null);
+    setUploadedUrl(null);
+    setValue("file", null);
+    setValue("url", null);
+  };
+
+
+
   const handleSuccess = (url) => {
     const handleCopy = (url) => {
-    navigator.clipboard.writeText(url).then(() => {
-    
-      console.log("Link Copied to Clipboard!"); 
-    }).catch((err) => {
-      console.error("Failed to copy text: ", err); 
+      navigator.clipboard
+        .writeText(url)
+        .then(() => {
+          console.log("Link Copied to Clipboard!");
+        })
+        .catch((err) => {
+          console.error("Failed to copy text: ", err);
+        });
+    };
+  
+    const handleShare = (url) => {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(url)}`;
+      window.open(whatsappUrl, "_blank");
+    };
+  
+    Swal.fire({
+      html: `<div id="success-alert"></div>`,
+      showConfirmButton: true,
+      confirmButtonText: "OK",
+      customClass: {
+        confirmButton:
+          "bg-yellow-400 text-black px-6 py-2 rounded-full font-semibold hover:bg-yellow-500",
+        popup: "rounded-3xl p-6 shadow-lg",
+      },
+      showCloseButton: true,
+      didOpen: () => {
+        const onCopy = () => {
+          handleCopy(url);
+          Swal.close();
+        };
+  
+        const onShare = () => {
+          handleShare(url);
+          Swal.close();
+        };
+  
+        const root = ReactDOM.createRoot(
+          document.getElementById("success-alert")
+        );
+        root.render(
+          <SuccessAlert link={url} onCopy={onCopy} onShare={onShare} />
+        );
+      },
+      didClose: () => {
+        remove();
+      },
     });
   };
-    const handleShare = (url) => {
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(url)}`;
-    window.open(whatsappUrl, '_blank'); 
-  };
-
-   Swal.fire({
-    html: `<div id="success-alert"></div>`, 
-    showConfirmButton: true,
-    confirmButtonText: "OK",
-    customClass: {
-      confirmButton:
-        "bg-yellow-400 text-black px-6 py-2 rounded-full font-semibold hover:bg-yellow-500",
-      popup: "rounded-3xl p-6 shadow-lg",
-    },
-    showCloseButton: true,
-    didOpen: () => {
-      const onCopy = () => {
-        handleCopy(url); 
-        Swal.close();  
-      };
-
-           const onShare = () => {
-        handleShare(url); 
-        Swal.close(); 
-      };
-      const root = ReactDOM.createRoot(document.getElementById('success-alert'));
-      root.render(
-        <SuccessAlert link={url} onCopy={onCopy} onShare={onShare} />
-      );
-    },
-  });
-};
 
 
 
