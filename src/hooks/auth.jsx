@@ -9,14 +9,30 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
   const router = useRouter();
 
 // get userr we
-  const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
-    '/api/v1/user', 
-    async () => {
+const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
+  typeof window !== 'undefined' && localStorage.getItem('auth_token')
+    ? '/api/v1/user'
+    : null,
+  async () => {
+    setIsLoading(true);
+
+    try {
       const res = await axios.get('/api/v1/user');
+      localStorage.setItem('user', JSON.stringify(res.data));
+      setIsLoading(false);
       return res.data;
-    },
-    { revalidateOnFocus: false }
-  );
+    } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+        router.push('/login'); // Arahkan ke login
+      }
+      setIsLoading(false);
+      throw error;
+    }
+  },
+  { revalidateOnFocus: false }
+);
   
   // get users => semuaaa user 
   
