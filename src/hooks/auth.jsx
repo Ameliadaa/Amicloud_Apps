@@ -111,12 +111,14 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
   // Fungsi Resend Email Verification
   const resendEmailVerification = useCallback(async ({ setStatus }) => {
     try {
-      const response = await axios.post('/api/v1/email/verification-notification');
+      const response = await axios.post('/api/v1/email/verification-notice');
       setStatus('A new verification link has been sent to the email address you provided during registration.');
     } catch (error) {
       console.error('Gagal mengirim ulang email verifikasi:', error);
     }
   }, []);
+
+ 
 
   // Fungsi Forgot Password
   const forgotPassword = useCallback(
