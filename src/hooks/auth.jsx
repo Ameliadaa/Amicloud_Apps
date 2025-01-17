@@ -1,46 +1,44 @@
 
-import { useEffect, useCallback } from 'react';
-import axios from '@/lib/axios'; 
+import axios from '@/lib/axios';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 
 export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
   const router = useRouter();
 
-// get userr we
-const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
-  typeof window !== 'undefined' && localStorage.getItem('auth_token')
-    ? '/api/v1/user'
-    : null,
-  async () => {
-    setIsLoading(true);
+  const [isLoading, setIsLoading] = useState(true);
 
-    try {
-      const res = await axios.get('/api/v1/user');
-      localStorage.setItem('user', JSON.stringify(res.data));
-      setIsLoading(false);
-      return res.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user');
-        router.push('/login'); // Arahkan ke login
+  const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
+    typeof window !== 'undefined' && localStorage.getItem('auth_token')
+      ? '/api/v1/user'
+      : null,
+    async () => {
+      setIsLoading(true);
+
+      try {
+        const res = await axios.get('/api/v1/user');
+        localStorage.setItem('user', JSON.stringify(res.data));
+        setIsLoading(false);
+        return res.data;
+      } catch (error) {
+        if (error.response?.status === 401) {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user');
+          router.push('/login'); // Arahkan ke login
+        }
+        setIsLoading(false);
+        throw error;
       }
-      setIsLoading(false);
-      throw error;
-    }
-  },
-  { revalidateOnFocus: false }
-);
-  
-  // get users => semuaaa user 
-  
+    },
+    { revalidateOnFocus: false }
+  );
 
   // ini buattt csrf
   const csrf = useCallback(async () => {
     try {
-      await axios.get('/sanctum/csrf-cookie'); 
+      await axios.get('/sanctum/csrf-cookie');
     } catch (error) {
       console.error('Gagal mendapatkan CSRF token:', error);
     }
@@ -61,10 +59,7 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
           password,
           password_confirmation: confirmPassword,
         });
-
-        localStorage.setItem('auth_token', response.data.token); 
-        setStatus('Registration successful! Please verify your email.');
-        router.push('/verify-email'); 
+        router.push('/verify-email');
       } catch (error) {
         if (error.response?.data) {
           setErrors(error.response.data.errors || [error.response.data.message]);
@@ -81,18 +76,17 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
     async ({ email, password, setErrors }) => {
       await csrf();
       setErrors([]);
-  
+
       try {
         const response = await axios.post('/api/v1/login', { email, password });
-  
+
         localStorage.setItem('auth_token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user)); // Simpan data user
         await mutateUser();
         router.push('/Dashboard');
       } catch (error) {
         if (error.response?.status === 422) {
           setErrors(error.response.data.errors);
-        } else if (error.response?.data?.message) {
-          setErrors([error.response.data.message]);
         } else {
           setErrors(['An unexpected error occurred.']);
         }
@@ -100,14 +94,14 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
     },
     [csrf, mutateUser, router]
   );
-  
 
   // Fungsi Logout
   const logout = useCallback(async () => {
     try {
       await axios.post('/api/v1/logout');
-      localStorage.removeItem('auth_token'); 
-      mutateUser(null); 
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user'); // Hapus data user
+      mutateUser(null);
       router.push('/login');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -128,9 +122,9 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
   const forgotPassword = useCallback(
     async ({ email, setErrors, setStatus }) => {
       await csrf();
-      setErrors([]); 
-      setStatus(null); 
-  
+      setErrors([]);
+      setStatus(null);
+
       try {
         const response = await axios.post('/api/v1/forgot-password', { email });
 
@@ -138,8 +132,8 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
           setStatus(response.data.message || 'Password reset email sent successfully.');
         }
       } catch (error) {
-        if (error.response?.status === 422) {        
-           setErrors(error.response.data.errors || ['Invalid email address.']);
+        if (error.response?.status === 422) {
+          setErrors(error.response.data.errors || ['Invalid email address.']);
         } else {
           setErrors(['An unexpected error occurred. Please try again.']);
         }
@@ -147,7 +141,7 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
     },
     [csrf]
   );
-  
+
 
   // Fungsi Reset Password
   const resetPassword = useCallback(
@@ -164,7 +158,7 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
           password_confirmation: confirmPassword,
         });
 
-        router.push('/login?reset=' + btoa(response.data.status)); 
+        router.push('/login?reset=' + btoa(response.data.status));
       } catch (error) {
         if (error.response?.status === 422) {
           setErrors(error.response.data.errors);
@@ -179,19 +173,31 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
   // Middleware untuk redirect (Auth/Guest)
   useEffect(() => {
     if (middleware === 'auth' && !user && !fetchError) {
-      mutateUser(); 
+      mutateUser();
     }
 
     if (user && middleware === 'guest') {
-      router.push(redirectIfAuthenticated || '/Dashboard'); 
+      router.push(redirectIfAuthenticated || '/Dashboard');
     }
 
-    if (fetchError && middleware === 'auth') {
-      router.push('/login'); 
+    if (user && middleware === 'admin' && user.id != 1) {
+      router.push('/Dashboard');
+    }
+
+    if (fetchError?.response?.status === 401 && middleware === 'auth') {
+      // Error 401 di middleware auth, logout otomatis
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      router.push('/login');
     }
   }, [middleware, user, fetchError, redirectIfAuthenticated, router, mutateUser]);
 
- 
+  useEffect(() => {
+    if (!localStorage.getItem('auth_token') || user || fetchError) {
+      setIsLoading(false);
+    }
+  }, [user, fetchError]);
+
   return {
     user,
     register,
@@ -201,8 +207,8 @@ const { data: user, error: fetchError, mutate: mutateUser } = useSWR(
     forgotPassword,
     resetPassword,
     csrf,
+    isLoading,
     error: fetchError,
   };
 
 };
-
