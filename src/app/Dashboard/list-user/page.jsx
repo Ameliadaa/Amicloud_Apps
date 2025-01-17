@@ -58,7 +58,7 @@ function ListUser() {
     }
   }, [pagination.currentPage, pagination.perPage, searchQuery, mutateUsers, users]);
 
-  if (!user) {
+  if (!users) {
     return null; 
   }
 

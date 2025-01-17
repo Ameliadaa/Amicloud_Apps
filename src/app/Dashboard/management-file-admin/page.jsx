@@ -9,8 +9,8 @@ import { generateLink } from "@/lib/image";
 import { showConfirmDialog } from "@/lib/modal";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { use, useEffect, useState } from "react";
-import { set } from "react-hook-form";
+import React, { Suspense, useEffect, useState } from "react";
+
 import { AiOutlineEye, AiOutlineSearch } from "react-icons/ai";
 import {
   MdDeleteOutline,
@@ -149,7 +149,7 @@ function FileManagement() {
     }, 3000);
   }
 
-  const handleDelete = (fileId, type = "upload") => {
+  const handleDelete = async (fileId, type = "upload") => {
     showConfirmDialog({
       alertContent: "Are you sure you want to delete this file?",
       onConfirm: () => {
@@ -169,6 +169,7 @@ function FileManagement() {
 
 
   return (
+     <Suspense fallback={<div>Loading...</div>}>
     <div className="p-6">
       {notification && notification.show && (
         <Notification message={notification.message} />
@@ -239,9 +240,9 @@ function FileManagement() {
                     <td className="px-4 py-2">
                       <Image
                         src={generateLink(user.file_path)}
-                        alt="Thumbnail"
+                        alt={`Thumbnail of ${user.filename}`}
                         className="w-10 h-10 object-cover rounded-full"
-                        height={40} width={40} priority
+                        height={40} width={40} 
                       />
                     </td>
                     <td className="px-4 py-2">
@@ -445,6 +446,7 @@ function FileManagement() {
         </div>
       )}
     </div>
+    </Suspense>
   );
 }
 
