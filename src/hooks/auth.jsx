@@ -59,6 +59,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
           password,
           password_confirmation: confirmPassword,
         });
+        setStatus(response.data.message ||'Registration successful! Please verify your email.');
         router.push('/verify-email');
       } catch (error) {
         if (error.response?.data) {
@@ -117,6 +118,34 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
       console.error('Gagal mengirim ulang email verifikasi:', error);
     }
   }, []);
+
+
+  // fungsi verify email 
+  const verifyEmail = useCallback(
+    async ({ id, hash, setStatus, setErrors }) => {
+      setErrors([]);
+      setStatus(null);
+  
+      if (!id || !hash) {
+        setErrors(['Invalid verification link.']);
+        return;
+      }
+  
+      try {
+        const response = await axios.get(`/api/v1/verify-email/${id}/${hash}`);
+        setStatus('Verification successful! You can now log in.');
+        router.push('/login');
+      } catch (error) {
+        if (error.response?.data) {
+          setErrors([error.response.data.message || 'Verification failed.']);
+        } else {
+          setErrors(['An unexpected error occurred.']);
+        }
+      }
+    },
+    [router]
+  );
+  
 
  
 
@@ -206,6 +235,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     login,
     logout,
     resendEmailVerification,
+    verifyEmail,
     forgotPassword,
     resetPassword,
     csrf,

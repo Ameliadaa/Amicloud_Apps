@@ -14,7 +14,8 @@ export default function VerificationPage() {
   const { logout, resendEmailVerification } = useAuth();
 
   const [status, setStatus] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
+  
 
   const handleResendEmail = async () => {
     setIsLoading(true); 
@@ -25,6 +26,11 @@ export default function VerificationPage() {
     } finally {
       setIsLoading(false); 
     }
+  };
+
+  const handleLogout = () => {
+    console.log('Logging out from VerificationPage...');
+    logout();
   };
 
 
@@ -55,7 +61,7 @@ export default function VerificationPage() {
 
       <p className="mt-6 text-center text-sm md:text-base text-gray-500">
       Not using your account anymore?&nbsp;
-        <button onClick={logout} className="text-blue-500 underline hover:underline">
+        <button onClick={handleLogout} className="text-blue-500 underline hover:underline">
           Log Out
         </button>
       </p>

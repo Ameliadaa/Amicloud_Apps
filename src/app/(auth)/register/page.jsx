@@ -33,7 +33,7 @@ const Register = () => {
         setStatus,
       });
 
-      if (status) {
+      if (!serverErrors.length && status) {
         reset();
         console.log("Redirecting to verify email page...");
       }
