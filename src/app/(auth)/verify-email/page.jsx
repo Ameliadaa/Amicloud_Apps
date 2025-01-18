@@ -73,11 +73,12 @@
 //   );
 // }
 
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/hooks/auth"; // Hook untuk autentikasi
+import React from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/auth";
+import {useRouter} from "next/navigation";
 import axios from "@/lib/axios"; // Axios instance yang telah diatur
 
 export default function VerificationPage() {
