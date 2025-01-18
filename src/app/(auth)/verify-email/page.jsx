@@ -36,6 +36,40 @@ export default function VerificationPage() {
     logout();
   };
 
+  const handleVerification = async () => {
+    // Extract query params from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("id");
+    const hash = urlParams.get("hash");
+    const expires = urlParams.get("expires");
+    const signature = urlParams.get("signature");
+
+    if (id && hash && expires && signature) {
+      try {
+        const response = await fetch(
+          `https://api-amicloud.temukreatif.id/api/verify-email/${id}/${hash}?expires=${expires}&signature=${signature}`
+        );
+
+        if (response.ok) {
+          setStatus("Your email has been verified successfully!");
+          router.push("/dashboard"); // Redirect to dashboard or home after success
+        } else {
+          const errorData = await response.json();
+          setStatus(errorData.message || "Failed to verify email.");
+        }
+      } catch (error) {
+        console.error("Error verifying email:", error);
+        setStatus("Something went wrong while verifying the email.");
+      }
+    } else {
+      setStatus("Invalid verification URL.");
+    }
+  };
+
+  React.useEffect(() => {
+    handleVerification();
+  }, []);
+
 
   return (
     <>
