@@ -1,9 +1,12 @@
+
+
 'use client';
 
 import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/auth";
 import {useRouter} from "next/navigation";
+
 
 
 export default function VerificationPage() {
@@ -32,6 +35,7 @@ export default function VerificationPage() {
     console.log('Logging out from VerificationPage...');
     logout();
   };
+
 
   return (
     <>
