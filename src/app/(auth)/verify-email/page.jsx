@@ -11,7 +11,10 @@ import {useRouter} from "next/navigation";
 
 export default function VerificationPage() {
   const router = useRouter();
-  const { logout, resendEmailVerification } = useAuth();
+  const { logout, resendEmailVerification } = useAuth({
+    middleware: "auth",
+    redirectIfAuthenticated: "/login",
+  });
 
   const [status, setStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
