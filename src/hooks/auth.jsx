@@ -146,9 +146,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     [router]
   );
   
-
- 
-
+  
   // Fungsi Forgot Password
   const forgotPassword = useCallback(
     async ({ email, setErrors, setStatus }) => {
