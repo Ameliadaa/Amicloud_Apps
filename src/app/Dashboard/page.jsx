@@ -18,6 +18,7 @@ function FileUpload() {
   useAuth({ middleware: "auth" });
   const { user } = useAuth();
   const router = useRouter();
+  const { verified } = router.query;
 
   const { uploadImage, linkUpload } = useAuthenticatedFeatures();
   const [uploadedImage, setUploadedImage] = useState(null);
