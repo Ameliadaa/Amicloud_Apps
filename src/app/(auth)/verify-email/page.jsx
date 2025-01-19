@@ -42,19 +42,24 @@ export default function VerificationPage() {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get("id");
       const hash = urlParams.get("hash");
+      const expires = urlParams.get("expires");
+      const signature = urlParams.get("signature");
 
-      if (id && hash) {
+      if (id && hash && expires && signature) {
         try {
-          await verifyEmail({ id, hash, setStatus, setErrors });
+          await verifyEmail({
+            id,
+            hash,
+            setStatus,
+            setErrors,
+          });
           router.push("/Dashboard?verified=1");
         } catch (error) {
-          console.error("Failed to verify email:", error);
-          setErrors([
-            "An unexpected error occurred during email verification.",
-          ]);
+          console.error("Email verification failed:", error);
+          setErrors(["Invalid or expired verification link."]);
         }
       } else {
-        setErrors(["Invalid or missing verification link."]);
+        setErrors(["Verification link is incomplete or invalid."]);
       }
     }
   };

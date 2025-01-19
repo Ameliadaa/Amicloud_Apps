@@ -146,25 +146,31 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
   //   [router]
   // );
 
-  const verifyEmail = async ({ id, hash, setStatus, setErrors }) => {
+  const verifyEmail = async ({
+    id,
+    hash,
+    expires,
+    signature,
+    setStatus,
+    setErrors,
+  }) => {
     setErrors([]);
     setStatus(null);
 
-    if (!id || !hash) {
+    if (!id || !hash || !expires || !signature) {
       setErrors(["Invalid verification link."]);
       return;
     }
 
     try {
       const response = await axios.get(
-        `https://api-amicloud.temukreatif.id/email-verify`,
+        `https://api-amicloud.temukreatif.id/api/v1/email-verify/${id}/${hash}`,
         {
-          params: { id, hash },
+          params: { expires, signature },
         }
       );
 
       setStatus("Email berhasil diverifikasi!");
-
       router.push("/Dashboard?verified=1");
     } catch (error) {
       if (error.response?.data) {
