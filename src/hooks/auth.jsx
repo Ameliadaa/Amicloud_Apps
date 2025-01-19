@@ -121,30 +121,60 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
 
   // fungsi verify email 
-  const verifyEmail = useCallback(
-    async ({ id, hash, setStatus, setErrors }) => {
-      setErrors([]);
-      setStatus(null);
+  // const verifyEmail = useCallback(
+  //   async ({ id, hash, setStatus, setErrors }) => {
+  //     setErrors([]);
+  //     setStatus(null);
   
-      if (!id || !hash) {
-        setErrors(['Invalid verification link.']);
-        return;
-      }
+  //     if (!id || !hash) {
+  //       setErrors(['Invalid verification link.']);
+  //       return;
+  //     }
   
-      try {
-        const response = await axios.get(`/api/v1/verify-email/${id}/${hash}`);
-        setStatus('Verification successful! You can now log in.');
-        router.push('/login');
-      } catch (error) {
-        if (error.response?.data) {
-          setErrors([error.response.data.message || 'Verification failed.']);
-        } else {
-          setErrors(['An unexpected error occurred.']);
+  //     try {
+  //       const response = await axios.get(`/api/v1/verify-email/${id}/${hash}`);
+  //       setStatus('Verification successful! You can now log in.');
+  //       router.push('/login');
+  //     } catch (error) {
+  //       if (error.response?.data) {
+  //         setErrors([error.response.data.message || 'Verification failed.']);
+  //       } else {
+  //         setErrors(['An unexpected error occurred.']);
+  //       }
+  //     }
+  //   },
+  //   [router]
+  // );
+
+  const verifyEmail = async ({ id, hash, setStatus, setErrors }) => {
+    setErrors([]);
+    setStatus(null);
+
+    if (!id || !hash) {
+      setErrors(["Invalid verification link."]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `https://api-amicloud.temukreatif.id/email-verify`,
+        {
+          params: { id, hash },
         }
+      );
+
+      setStatus("Email berhasil diverifikasi!");
+
+      router.push("/Dashboard?verified=1");
+    } catch (error) {
+      if (error.response?.data) {
+        setErrors([error.response.data.message || "Verification failed."]);
+      } else {
+        setErrors(["An unexpected error occurred."]);
       }
-    },
-    [router]
-  );
+    }
+  };
+
   
   
   // Fungsi Forgot Password
