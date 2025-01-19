@@ -11,7 +11,7 @@ import {useRouter} from "next/navigation";
 
 export default function VerificationPage() {
   const router = useRouter();
-  const { logout, resendEmailVerification } = useAuth({
+  const { logout, resendEmailVerification, verifyEmail } = useAuth({
     middleware: "auth",
     redirectIfAuthenticated: "/Dashboard",
   });
@@ -20,21 +20,42 @@ export default function VerificationPage() {
   const [errors, setErrors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   
-  const handleVerification = async () => {
-    // Extract query params from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
-    const hash = urlParams.get("hash");
+  // const handleVerification = async () => {
+  //   const urlParams = new URLSearchParams(window.location.search);
+  //   const id = urlParams.get("id");
+  //   const hash = urlParams.get("hash");
 
-    if (id && hash) {
-      try {
-        await verifyEmail({ id, hash, setStatus, setErrors });
-      } catch (error) {
-        console.error("Failed to verify email:", error);
-        setErrors(["An unexpected error occurred during email verification."]);
+  //   if (id && hash) {
+  //     try {
+  //       await verifyEmail({ id, hash, setStatus, setErrors });
+  //     } catch (error) {
+  //       console.error("Failed to verify email:", error);
+  //       setErrors(["An unexpected error occurred during email verification."]);
+  //     }
+  //   } else {
+  //     setErrors(["Invalid or missing verification link."]);
+  //   }
+  // };
+
+  const handleVerification = async () => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get("id");
+      const hash = urlParams.get("hash");
+
+      if (id && hash) {
+        try {
+          await verifyEmail({ id, hash, setStatus, setErrors });
+          router.push("/Dashboard?verified=1");
+        } catch (error) {
+          console.error("Failed to verify email:", error);
+          setErrors([
+            "An unexpected error occurred during email verification.",
+          ]);
+        }
+      } else {
+        setErrors(["Invalid or missing verification link."]);
       }
-    } else {
-      setErrors(["Invalid or missing verification link."]);
     }
   };
 
