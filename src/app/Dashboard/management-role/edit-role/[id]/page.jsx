@@ -27,39 +27,22 @@ const EditRole = () => {
 
   const { roleList, permissionList, updateRole, getRoleById } = useRoleManagement();
 
-  // useEffect(() => {
-  //   const fetchRole = async () => {
-  //     if (!roleList || !permissionList) {
-  //       return;
-  //     }
-
-  //     const foundRole = await getRoleById(roleId);
-
-  //     if (foundRole) {
-  //       setRole(foundRole);
-  //       setSelectedPermissions(foundRole.permission_id);
-  //     }
-  //   };
-
-  //   fetchRole();
-  // }, [roleList, permissionList]);
-
   useEffect(() => {
     const fetchRole = async () => {
       if (!roleList || !permissionList) {
         return;
       }
-  
+
       const foundRole = await getRoleById(roleId);
-  
+
       if (foundRole) {
         setRole(foundRole);
         setSelectedPermissions(foundRole.permission_id);
       }
     };
-  
+
     fetchRole();
-  }, [roleList, permissionList, getRoleById, roleId]);
+  }, [roleList, permissionList]);
 
   const onSubmit = async (data) => {
     const payload = {
