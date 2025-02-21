@@ -236,7 +236,7 @@ export default function FileUpload() {
                 <input
                   id="image"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,application/pdf"
                   className="hidden"
                   {...register("image", { required: "File is required" })}
                   onChange={(event) => {
