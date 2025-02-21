@@ -299,49 +299,6 @@ export default function FileUpload() {
                 )}
               </div>
             </div>
-
-{uploadedImage ? (
-  <div className="flex flex-col items-center mt-4">
-    <div className="max-h-48 max-w-48 bg-tertiary-25 rounded-2xl p-4 relative">
-      <Image
-        src={uploadedImage}
-        alt="Uploaded preview"
-        className="w-32 h-32 object-cover rounded-lg"
-        width={40}
-        height={40}
-      />
-      <button
-        type="button"
-        onClick={removeFile}
-        className="absolute -bottom-3 -right-3 bg-white text-red-600 p-2 rounded-lg shadow-md hover:bg-red-600 hover:text-white"
-      >
-        <FaRegTrashCan className="w-5 h-5" />
-      </button>
-    </div>
-  </div>
-) : uploadedUrl && uploadedData?.image_url?.endsWith(".pdf") ? (
-  <div className="flex flex-col items-center mt-4">
-    <div className="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center">
-      <p className="text-lg font-semibold text-gray-800">PDF Uploaded</p>
-      <a
-        href={uploadedUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-2 text-blue-600 hover:underline"
-      >
-        View PDF
-      </a>
-      <button
-        type="button"
-        onClick={removeFile}
-        className="mt-2 text-red-600"
-      >
-        <FaRegTrashCan />
-      </button>
-    </div>
-  </div>
-) : null}
-
             
             {uploadedImage && (
               <div className="flex flex-col items-center mt-4 ">
