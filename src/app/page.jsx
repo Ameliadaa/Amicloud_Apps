@@ -119,45 +119,93 @@ export default function FileUpload() {
 
 
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
+  // const handleFileUpload = async (event) => {
+  //   const file = event.target.files[0];
 
-    if (file) {
-      try {
-        const response = await uploadImage(file);
-        if (response.image_url) {
-          const imageUrl = URL.createObjectURL(file);
-          setUploadedImage(imageUrl);
-          setUploadedData(response);
-          setValue("file", file, { shouldValidate: true });
-          trigger("file");
-          Swal.fire({
-            icon: "success",
-            title: "File Uploaded Successfully",
-            text: "Your file has been uploaded. Please click 'Get Link' to obtain the URL.",
-            confirmButtonText: "OK",
-            customClass: {
-              confirmButton: "bg-secondary px-10 py-2 text-black rounded-2xl",
-              popup: "rounded-3xl shadow-md",
-            },
-          });
+  //   if (file) {
+  //     try {
+  //       const response = await uploadImage(file);
+  //       if (response.image_url) {
+  //         const imageUrl = URL.createObjectURL(file);
+  //         setUploadedImage(imageUrl);
+  //         setUploadedData(response);
+  //         setValue("file", file, { shouldValidate: true });
+  //         trigger("file");
+  //         Swal.fire({
+  //           icon: "success",
+  //           title: "File Uploaded Successfully",
+  //           text: "Your file has been uploaded. Please click 'Get Link' to obtain the URL.",
+  //           confirmButtonText: "OK",
+  //           customClass: {
+  //             confirmButton: "bg-secondary px-10 py-2 text-black rounded-2xl",
+  //             popup: "rounded-3xl shadow-md",
+  //           },
+  //         });
+  //       } else {
+  //         throw new Error("Unexpected response format.");
+  //       }
+  //     } catch (error) {
+  //       Swal.fire({
+  //         icon: "Warning",
+  //         title: "Upload Failed",
+  //         text: error.message || "An error occurred while uploading the file.",
+  //         confirmButtonText: "OK",
+  //         customClass: {
+  //           confirmButton: "bg-secondary px-10 py-2 text-black rounded-2xl",
+  //           popup: "rounded-3xl shadow-md",
+  //         },
+  //       });
+  //     }
+  //   }
+  // };
+
+  const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+
+  if (file) {
+    try {
+      const response = await uploadImage(file);
+      if (response.image_url) {
+        setUploadedData(response);
+        setValue("file", file, { shouldValidate: true });
+        trigger("file");
+
+        if (file.type === "application/pdf") {
+          setUploadedImage(null); 
+          setUploadedUrl(response.image_url); 
         } else {
-          throw new Error("Unexpected response format.");
+          const imageUrl = URL.createObjectURL(file);
+          setUploadedImage(imageUrl); 
         }
-      } catch (error) {
+
         Swal.fire({
-          icon: "Warning",
-          title: "Upload Failed",
-          text: error.message || "An error occurred while uploading the file.",
+          icon: "success",
+          title: "File Uploaded Successfully",
+          text: "Your file has been uploaded. Please click 'Get Link' to obtain the URL.",
           confirmButtonText: "OK",
           customClass: {
             confirmButton: "bg-secondary px-10 py-2 text-black rounded-2xl",
             popup: "rounded-3xl shadow-md",
           },
         });
+      } else {
+        throw new Error("Unexpected response format.");
       }
+    } catch (error) {
+      Swal.fire({
+        icon: "warning",
+        title: "Upload Failed",
+        text: error.message || "An error occurred while uploading the file.",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "bg-secondary px-10 py-2 text-black rounded-2xl",
+          popup: "rounded-3xl shadow-md",
+        },
+      });
     }
-  };
+  }
+};
+
 
 
  const handleGetLink = () => {
