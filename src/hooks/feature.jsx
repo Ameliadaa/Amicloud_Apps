@@ -4,7 +4,7 @@ import axios from '@/lib/axios';
 import { useAuth } from '@/hooks/auth';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
-const SUPPORTED_FORMATS = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/webp"];
+const SUPPORTED_FORMATS = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/webp", "application/pdf"];
 const MAX_GUEST_UPLOADS = 3;
 
 const getGuestUploadCount = () => {
